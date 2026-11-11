@@ -1,0 +1,18 @@
+{
+  "name": "spec-fusion",
+  "description": "Spec Fusion manual software development workflow",
+  "plugins": [
+    {
+      "name": "spec-fusion",
+      "source": "./",
+      "description": "Manual Matt Pocock and OpenSpec development workflow with review gates, requirement deltas, and verification.",
+      "category": "engineering",
+      "keywords": [
+        "openspec",
+        "matt-pocock",
+        "review",
+        "specs"
+      ]
+    }
+  ]
+}

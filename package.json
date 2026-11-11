@@ -1,0 +1,35 @@
+{
+  "name": "spec-fusion",
+  "version": "0.1.0",
+  "description": "Manual Matt Pocock and OpenSpec development workflow with review gates, requirement deltas, and verification.",
+  "type": "module",
+  "bin": {
+    "spec-fusion": "./bin/spec-fusion.mjs"
+  },
+  "files": [
+    "bin/",
+    "skills/",
+    "plugin.json",
+    ".codex-plugin/",
+    ".agents/",
+    ".claude-plugin/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test",
+    "pack:check": "npm pack --dry-run --json"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "codex",
+    "gemini",
+    "claude",
+    "skills",
+    "openspec",
+    "matt-pocock"
+  ],
+  "license": "MIT"
+}

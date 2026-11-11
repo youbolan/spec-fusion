@@ -1,0 +1,11 @@
+{
+  "name": "spec-fusion",
+  "version": "0.1.0",
+  "description": "Manual Matt Pocock and OpenSpec development workflow with review gates, requirement deltas, and verification.",
+  "author": {
+    "name": "Spec Fusion maintainers"
+  },
+  "skills": [
+    "./skills/spec-fusion"
+  ]
+}
