@@ -2,9 +2,35 @@
 
 **Project-local installation is the default.** Install this skill inside each repository that should use it. Do **not** copy it into an agent's global/home-level skill directory. Check the skill into Git if teammates should use the same workflow.
 
-Spec Fusion is only a manual workflow guide. It does **not** bundle or automatically install Matt Pocock's skills or OpenSpec. Install these prerequisites separately as appropriate for each agent and repository.
+Spec Fusion is a manual workflow guide plus eight stage-specific command adapters. It does **not** bundle or automatically install Matt Pocock's skills or OpenSpec. Install these prerequisites separately as appropriate for each agent and repository.
 
-## Recommended: one physical copy, all three agents (macOS/Linux)
+## Eight custom stage commands (v0.2.0)
+
+To install the **namespaced stage commands**, use the project-local CLI from the publisher checkout, or the published npm CLI when available:
+
+```sh
+# From the checked-out spec-fusion publisher repository:
+node ./bin/spec-fusion.mjs init --project /absolute/path/to/your-project
+
+# Once the npm package is actually published:
+# cd /path/to/your-project
+# npm install --save-dev spec-fusion
+# npx spec-fusion init
+```
+
+The installer writes **only inside the target project**:
+
+- Codex: `.agents/skills/spec-fusion-1-interview-and-clarify/SKILL.md` through `.agents/skills/spec-fusion-8-archive/SKILL.md`, plus the main `spec-fusion` guide. Invoke `$spec-fusion-1-interview-and-clarify`, etc.
+- Claude Code: `.claude/commands/spec-fusion/1-interview-and-clarify.md` through `8-archive.md`, plus the main skill at `.claude/skills/spec-fusion/`. Invoke `/spec-fusion:1-interview-and-clarify`, etc.
+- Gemini CLI: `.gemini/commands/spec-fusion/1-interview-and-clarify.toml` through `8-archive.toml`, plus the shared skill under `.agents/skills/`. Invoke `/spec-fusion:1-interview-and-clarify`, etc., then use `/commands reload` if necessary.
+
+The **Claude plugin** exposes `/spec-fusion:<stage>` directly when installed as a plugin; its `commands/` directory contains these same eight prompts. The **Codex plugin** exposes eight named stage skills. The generic `npx skills add OWNER/spec-fusion` installer installs the repository's skill directories but does *not* copy the Claude command or Gemini TOML adapters automatically. To get the exact namespaced commands when using GitHub-only distribution, clone the publisher repository and run the Node CLI shown above.
+
+These aliases instruct the agent to use the installed upstream workflows, not programmatically invoke another slash command via guaranteed dispatch. If nested invocation is unsupported or upstream prohibits it, the stage must stop with the exact direct command and report the limitation. No stage auto-chains, and nothing publishes without user consent.
+
+---
+
+## Manual guide-only installation (macOS/Linux)
 
 Run this **from the root of your code project**, not from the agent's installation directory:
 
@@ -63,7 +89,7 @@ Place the **folder** `spec-fusion` at the appropriate relative location so that 
 - **Claude Code:** Run `/spec-fusion`.
 - **Gemini CLI:** Ask "Use the spec-fusion skill and show the manual workflow"; check `/skills list` if needed.
 
-The skill **never auto-chains stages**. Invoke Matt Pocock and OpenSpec independently, one stage at a time. The workflow is in [WORKFLOW.md](WORKFLOW.md), and copy/paste handoffs are in [HANDOFFS.md](HANDOFFS.md).
+The skill **never auto-chains stages**. The new namespaced commands attempt to route one stage to an installed upstream workflow; invoke Matt Pocock or OpenSpec directly when nested invocation is unavailable. The workflow is in [WORKFLOW.md](WORKFLOW.md), and copy/paste handoffs are in [HANDOFFS.md](HANDOFFS.md).
 
 ## Prerequisites and published identifiers (checked November 2026)
 
@@ -130,10 +156,10 @@ npm install --save-dev spec-fusion
 npx spec-fusion init
 ```
 
-`npm install` places the CLI in `node_modules`; the explicit `init` command copies the
-skill to `.agents/skills/spec-fusion` and links (or copies) it into `.claude/skills/`.
+`npm install` places the CLI in `node_modules`; the explicit `init` command installs
+the main guide, eight stage skills, and Claude/Gemini namespaced command files in the project.
 The initializer never writes to the agent's home directory, and it never replaces
-an existing installed skill automatically. Select specific agents with
+an existing installed skill or stage-command file automatically. Select specific agents with
 `npx spec-fusion init --agent codex`, `--agent gemini`, or `--agent claude`.
 The npm package name must be confirmed available before publishing.
 

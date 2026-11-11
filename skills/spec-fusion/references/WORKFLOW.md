@@ -45,3 +45,20 @@ flowchart TD
 - **Codex spells OpenSpec skills differently:** `$openspec-new-change`, `$openspec-ff-change`, `$openspec-apply-change`, `$openspec-verify-change`, `$openspec-archive-change`.
 - Matt Pocock's published interview name is **`grill-with-docs`** (with `docs`, plural).
 - Git commits at checkpoints make it easier to stop and switch between Codex, Gemini CLI, and Claude Code.
+
+## Stage-specific command invocations
+
+Use the following namespaced commands after installing the project adapters or Claude plugin:
+
+```text
+/spec-fusion:1-interview-and-clarify
+/spec-fusion:2-write-spec
+/spec-fusion:3-create-change
+/spec-fusion:4-plan
+/spec-fusion:5-implement
+/spec-fusion:6-code-review
+/spec-fusion:7-verify
+/spec-fusion:8-archive
+```
+
+Codex equivalents use `$spec-fusion-<stage>` rather than slash commands. Invoke **only one** and review its result before choosing the next. See [STAGES.md](STAGES.md).

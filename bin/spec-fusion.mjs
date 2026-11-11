@@ -4,27 +4,31 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const PACKAGE_ROOT = fileURLToPath(new URL('../', import.meta.url));
-const SKILL_SOURCE = path.join(PACKAGE_ROOT, 'skills', 'spec-fusion');
-const usage = `Spec Fusion — project-local skill installer
+const SKILLS_ROOT = path.join(PACKAGE_ROOT, 'skills');
+const MAIN_SKILL = path.join(SKILLS_ROOT, 'spec-fusion');
+const STAGES = [
+  '1-interview-and-clarify', '2-write-spec', '3-create-change', '4-plan',
+  '5-implement', '6-code-review', '7-verify', '8-archive',
+];
+const usage = `Spec Fusion — project-local workflow and stage-command installer
 
 Usage:
   spec-fusion init [--project DIR] [--agent codex|gemini|claude|all] [--copy]
   spec-fusion --help
 
-Default: install for Codex, Gemini CLI and Claude Code in the current project.
-Nothing is installed into global agent directories.
-Existing skill folders are never overwritten.
+Default: install for Codex, Gemini CLI, and Claude Code in the current project.
+No files are installed to agent-global directories. Existing paths are skipped.
+This installer does not install Matt Pocock skills or OpenSpec.
 `;
-
 function die(message) { console.error(`Error: ${message}`); process.exit(1); }
 function isPresent(location) {
-  try { lstatSync(location); return true; } catch (e) { if (e.code === 'ENOENT') return false; throw e; }
+  try { lstatSync(location); return true; }
+  catch (e) { if (e.code === 'ENOENT') return false; throw e; }
 }
 function readArgs(args) {
   let directory = process.cwd();
   const agents = new Set();
-  let copy = false;
-  let action = 'help';
+  let copy = false, action = 'help';
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
     if (arg === '-h' || arg === '--help' || arg === 'help') return { action: 'help' };
@@ -37,44 +41,53 @@ function readArgs(args) {
     die(`Unknown option: ${arg}`);
   }
   if (agents.has('all') && agents.size > 1) die('Use --agent all alone or choose specific agents');
-  if (agents.size === 0 || agents.has('all')) { agents.clear(); for (const a of ['codex','gemini','claude']) agents.add(a); }
-  for (const a of agents) if (!['codex','gemini','claude'].includes(a)) die(`Unsupported agent: ${a}`);
+  if (agents.size === 0 || agents.has('all')) { agents.clear(); for (const a of ['codex', 'gemini', 'claude']) agents.add(a); }
+  for (const a of agents) if (!['codex', 'gemini', 'claude'].includes(a)) die(`Unsupported agent: ${a}`);
   return { action, directory: path.resolve(directory), agents, copy };
 }
-function copyIfMissing(destination) {
+function copyIfMissing(source, destination) {
   if (isPresent(destination)) { console.log(`Already exists, skipped: ${destination}`); return false; }
+  if (!existsSync(source)) die(`Missing package resource: ${source}`);
   mkdirSync(path.dirname(destination), { recursive: true });
-  cpSync(SKILL_SOURCE, destination, { recursive: true, force: false, errorOnExist: true });
+  cpSync(source, destination, { recursive: true, force: false, errorOnExist: true });
   console.log(`Installed: ${destination}`);
   return true;
 }
 function init({ directory, agents, copy }) {
-  if (!existsSync(path.join(SKILL_SOURCE, 'SKILL.md'))) die('Missing bundled SKILL.md');
+  if (!existsSync(path.join(MAIN_SKILL, 'SKILL.md'))) die('Missing bundled Spec Fusion SKILL.md');
   if (!existsSync(directory)) die(`Project directory not found: ${directory}`);
   const sharedDest = path.join(directory, '.agents', 'skills', 'spec-fusion');
   const claudeDest = path.join(directory, '.claude', 'skills', 'spec-fusion');
   const shared = agents.has('codex') || agents.has('gemini');
-  if (shared) copyIfMissing(sharedDest);
-  if (agents.has('claude')) {
-    if (shared && !copy) {
-      if (isPresent(claudeDest)) {
-        console.log(`Already exists, skipped: ${claudeDest}`);
-      } else {
-        mkdirSync(path.dirname(claudeDest), { recursive: true });
-        const target = path.relative(path.dirname(claudeDest), sharedDest);
-        try {
-          symlinkSync(target, claudeDest, 'dir');
-          console.log(`Linked: ${claudeDest} -> ${target}`);
-        } catch (e) {
-          console.warn(`Symlink unavailable (${e.code || e.message}); copying instead.`);
-          copyIfMissing(claudeDest);
-        }
-      }
-    } else {
-      copyIfMissing(claudeDest);
+  if (shared) {
+    copyIfMissing(MAIN_SKILL, sharedDest);
+    for (const slug of STAGES) {
+      const name = `spec-fusion-${slug}`;
+      copyIfMissing(path.join(SKILLS_ROOT, name), path.join(directory, '.agents', 'skills', name));
     }
   }
-  console.log('Spec Fusion installed for the chosen agents. Matt Pocock and OpenSpec remain separate prerequisites.');
+  if (agents.has('claude')) {
+    if (shared && !copy) {
+      if (isPresent(claudeDest)) console.log(`Already exists, skipped: ${claudeDest}`);
+      else {
+        mkdirSync(path.dirname(claudeDest), { recursive: true });
+        const target = path.relative(path.dirname(claudeDest), sharedDest);
+        try { symlinkSync(target, claudeDest, 'dir'); console.log(`Linked: ${claudeDest} -> ${target}`); }
+        catch (e) { console.warn(`Symlink unavailable (${e.code || e.message}); copying instead.`); copyIfMissing(MAIN_SKILL, claudeDest); }
+      }
+    } else copyIfMissing(MAIN_SKILL, claudeDest);
+    for (const slug of STAGES) {
+      copyIfMissing(path.join(PACKAGE_ROOT, 'commands', `${slug}.md`),
+        path.join(directory, '.claude', 'commands', 'spec-fusion', `${slug}.md`));
+    }
+  }
+  if (agents.has('gemini')) {
+    for (const slug of STAGES) {
+      copyIfMissing(path.join(PACKAGE_ROOT, 'adapters', 'gemini', 'commands', 'spec-fusion', `${slug}.toml`),
+        path.join(directory, '.gemini', 'commands', 'spec-fusion', `${slug}.toml`));
+    }
+  }
+  console.log('Installed Spec Fusion guide and manual stage commands. Matt Pocock and OpenSpec remain separate prerequisites.');
 }
 const options = readArgs(process.argv.slice(2));
 if (options.action === 'help') { process.stdout.write(usage); process.exit(0); }

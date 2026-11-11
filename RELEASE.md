@@ -1,4 +1,8 @@
-# Release and publishing checklist
+# Release instructions — Spec Fusion v0.2.0
+
+This release adds eight manually invocable stage commands to Codex, Gemini CLI and Claude Code. Follow the remaining release instructions, then run `npm test` and `npm pack --dry-run` before publishing. Do not claim the plugin or npm package is already published.
+
+## Release and publishing checklist
 
 This distribution is prepared locally, **not published**. Do not claim the example install commands are live until completed.
 

@@ -19,6 +19,10 @@ Guide the user through **separate, manually invoked** Matt Pocock and OpenSpec s
 6. **Use actual installed commands.** The names in the table below are upstream identifiers. Verify installed skills and tool-specific spelling. If something is missing, explain how to install/enable it; do not silently substitute another flow.
 7. **Do not publish without consent.** Matt `/to-spec` can publish to the configured issue tracker. Ensure the user understands the destination and authorizes external publication; use a local-file tracker if they want a file-only workflow.
 
+## Stage-specific Spec Fusion commands
+
+To run **one step and stop**, use `/spec-fusion:1-interview-and-clarify` through `/spec-fusion:8-archive` in a Claude Code plugin or project-local command installation; Gemini CLI uses the same namespaced commands after installation. In Codex, invoke `$spec-fusion-1-interview-and-clarify` through `$spec-fusion-8-archive` as separate skills. Each stage attempts to use the corresponding **installed upstream** Matt Pocock or OpenSpec workflow, without automatically chaining to the next stage. Some agents restrict skill-to-skill invocation: follow installed upstream instructions only when allowed or ask the user to invoke the original command directly; do not claim an underlying command ran merely because its name was written in a prompt. See [STAGES.md](references/STAGES.md).
+
 ## Eight manual stages
 
 | # | Owner | Claude Code / Gemini CLI identifier | Codex OpenSpec equivalent | Stop-and-review outcome |

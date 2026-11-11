@@ -1,0 +1,24 @@
+---
+description: Spec Fusion stage 7 — Verify requirements, design and task acceptance before archiving.
+argument-hint: [feature or change identifier]
+---
+
+# Spec Fusion: 7-verify
+
+Stage: **Verify requirements, design and task acceptance before archiving.**
+Owner: **OpenSpec**. Upstream skill/command: **verify** (Claude/Gemini identifier: `/opsx:verify`; Codex equivalent: `$openspec-verify-change`).
+
+Read the relevant OpenSpec change, code and test evidence, and earlier code-review results where provided. Use installed OpenSpec verify workflow as a final focused acceptance gate. Check required scenarios, deltas, design and tasks; avoid pointless repetition of documented completed checks but independently evaluate any gaps. Do not archive or automatically implement fixes.
+
+Execution contract:
+- Execute ONLY this named stage; never automatically move to a later stage.
+- Check prerequisites and ask for missing approvals or inputs instead of guessing.
+- Prefer the installed upstream skill or command and use its documented instructions and tool permissions. Do not treat merely quoting a slash command as invoking it.
+- When the client cannot invoke an upstream skill from another skill, inspect the installed upstream instructions and follow them if allowed and accessible; if upstream forbids delegated invocation or is unavailable, tell the user the exact direct upstream command to run and STOP. Never falsely claim upstream execution.
+- Keep OpenSpec as the only canonical capability specification system and its Apply as the only implementation/task driver.
+- Summarize outputs and leave the user at a manual review checkpoint. Do not perform remote publication without explicit authorization.
+
+On completion, report: **Explicit pass/fail/unknown against specified acceptance scenarios, blockers.**
+
+
+User-supplied context: $ARGUMENTS

@@ -1,6 +1,6 @@
 {
   "name": "spec-fusion",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Manual Matt Pocock and OpenSpec development workflow with review gates, requirement deltas, and verification.",
   "type": "module",
   "bin": {
@@ -14,7 +14,9 @@
     ".agents/",
     ".claude-plugin/",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "commands/",
+    "adapters/"
   ],
   "scripts": {
     "test": "node --test",
