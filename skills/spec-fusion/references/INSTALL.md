@@ -4,6 +4,21 @@
 
 Spec Fusion is a manual workflow guide plus eight stage-specific command adapters. It does **not** bundle or automatically install Matt Pocock's skills or OpenSpec. Install these prerequisites separately as appropriate for each agent and repository.
 
+## Install with npx from GitHub (no npm package required)
+
+The Skills CLI requires Node.js 22.20 or newer. After the Spec Fusion publisher repository is pushed to GitHub, run these commands from your code project's root:
+
+```sh
+cd /path/to/your/code-project
+npx skills add YOUR_GITHUB_OWNER/spec-fusion --skill '*' \
+  -a codex -a gemini-cli -a claude-code
+npx skills list
+```
+
+Replace `YOUR_GITHUB_OWNER` with the actual owner. This installs all nine SKILL.md directories **project-locally** (main guide and eight standalone stage skills). To install just the guide, replace `--skill '*'` with `--skill spec-fusion`. For testing before GitHub publication, supply an absolute path to the extracted publisher checkout instead of `YOUR_GITHUB_OWNER/spec-fusion`.
+
+**Important limitation:** `npx skills add` cannot install this repository's custom Claude/Gemini slash command adapters. To get `/spec-fusion:1-interview-and-clarify` etc., use the Node initializer in the next section. Both routes require Matt Pocock and OpenSpec to be installed separately.
+
 ## Eight custom stage commands (v0.2.0)
 
 To install the **namespaced stage commands**, use the project-local CLI from the publisher checkout, or the published npm CLI when available:

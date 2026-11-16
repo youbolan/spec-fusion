@@ -4,6 +4,47 @@
 
 Spec Fusion **does not bundle** Matt Pocock's skills or OpenSpec. Install them separately. It does not automatically execute any development phase.
 
+## Quick start — install with npx from GitHub (no npm publication needed)
+
+**Recommended for GitHub distribution.** Requires Node.js **22.20+**, an accessible GitHub repository containing this publisher project, and no npm account. Run from the **target code project's root**, not the Spec Fusion source repository:
+
+```sh
+cd /path/to/your/code-project
+
+# Install the main workflow guide and all eight independently invoked stage skills
+npx skills add YOUR_GITHUB_OWNER/spec-fusion --skill '*' \
+  -a codex -a gemini-cli -a claude-code
+
+# Confirm skills were installed in this project
+npx skills list
+```
+
+Replace `YOUR_GITHUB_OWNER` with the actual GitHub username or organization. The repository must first be uploaded to GitHub; these commands are examples, not a live published address. **No `-g` flag:** installation stays project-local. To install *only* the main workflow guide instead of all nine skills:
+
+```sh
+npx skills add YOUR_GITHUB_OWNER/spec-fusion --skill spec-fusion \
+  -a codex -a gemini-cli -a claude-code
+```
+
+To test locally **before pushing to GitHub**, run the same installer against an extracted checkout:
+
+```sh
+cd /path/to/your/code-project
+npx skills add /absolute/path/to/spec-fusion-publisher --skill '*' \
+  -a codex -a gemini-cli -a claude-code
+```
+
+`npx skills add` installs SKILL.md directories, including Codex's `$spec-fusion-1-interview-and-clarify` stage skill. **It does not automatically install the custom Claude Code and Gemini CLI slash-command adapters** (`/spec-fusion:1-interview-and-clarify`, etc.). For those exact namespaced slash commands without publishing npm, first clone or extract the publisher repository, then initialize the *target* project:
+
+```sh
+node /absolute/path/to/spec-fusion-publisher/bin/spec-fusion.mjs init \
+  --project /absolute/path/to/your/code-project
+```
+
+The initializer also installs the main/stage skills and does not overwrite an existing skill by default. When an installation already exists, review the skipped files before updating. The `npx skills` route and the initializer are **alternative installation routes**; don't run both unless you specifically need the custom slash-command adapters.
+
+**Prerequisites:** Neither install route installs Matt Pocock's skills or the OpenSpec CLI. Install those independently. See [the skill installation guide](skills/spec-fusion/references/INSTALL.md).
+
 ## Install using npm (project-local)
 
 These commands work **after a maintainer publishes the npm package** and confirms that the `spec-fusion` package name is available:
