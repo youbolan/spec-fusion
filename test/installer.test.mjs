@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, lstatSync, rmSync } from 'node:fs';
+import { chmodSync, mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, lstatSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -14,7 +14,28 @@ function withProject(fn) {
   try { fn(dir); } finally { rmSync(dir, { recursive: true, force: true }); }
 }
 function run(project, ...args) {
-  return spawnSync(process.execPath, [cli, 'init', '--project', project, ...args], { encoding: 'utf8' });
+  return spawnSync(process.execPath, [cli, 'init', '--project', project, '--skip-deps', ...args], { encoding: 'utf8' });
+}
+function runWithMockBin(project, includeOpenspec, ...args) {
+  const binDir = mkdtempSync(path.join(tmpdir(), 'spec-fusion-bin-'));
+  const logFile = path.join(binDir, 'calls.log');
+  const writeMock = (name) => {
+    const file = path.join(binDir, name);
+    writeFileSync(file, `#!/bin/sh\necho "${name} $*" >> "${logFile}"\n`);
+    chmodSync(file, 0o755);
+  };
+  writeMock('npx');
+  if (includeOpenspec) writeMock('openspec');
+  try {
+    const res = spawnSync(process.execPath, [cli, 'init', '--project', project, ...args], {
+      encoding: 'utf8',
+      env: { ...process.env, PATH: `${binDir}:${process.env.PATH}` },
+    });
+    const calls = existsSync(logFile) ? readFileSync(logFile, 'utf8').trim().split('\n').filter(Boolean) : [];
+    return { res, calls };
+  } finally {
+    rmSync(binDir, { recursive: true, force: true });
+  }
 }
 test('default installs eight Codex skills and Claude/Gemini stage commands', () => withProject(p => {
   const r = run(p);
@@ -73,4 +94,21 @@ test('copy mode works without symlink', () => withProject(p => {
   const r = run(p, '--copy');
   assert.equal(r.status, 0, r.stderr);
   assert.ok(lstatSync(path.join(p, '.claude/skills/spec-fusion')).isDirectory());
+}));
+test('default init also installs Matt Pocock skills and initializes OpenSpec', () => withProject(p => {
+  const { res, calls } = runWithMockBin(p, true);
+  assert.equal(res.status, 0, res.stderr);
+  assert.ok(calls.includes('npx --yes skills@latest add mattpocock/skills --skill * -a codex -a gemini-cli -a claude-code -y'));
+  assert.ok(calls.includes('openspec init --tools codex,gemini,claude --force --no-animation'));
+}));
+test('agent filter scopes Matt Pocock skills and OpenSpec tools', () => withProject(p => {
+  const { res, calls } = runWithMockBin(p, true, '--agent', 'claude');
+  assert.equal(res.status, 0, res.stderr);
+  assert.ok(calls.includes('npx --yes skills@latest add mattpocock/skills --skill * -a claude-code -y'));
+  assert.ok(calls.includes('openspec init --tools claude --force --no-animation'));
+}));
+test('--skip-deps skips Matt Pocock skills and OpenSpec', () => withProject(p => {
+  const { res, calls } = runWithMockBin(p, true, '--skip-deps');
+  assert.equal(res.status, 0, res.stderr);
+  assert.equal(calls.length, 0);
 }));

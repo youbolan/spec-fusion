@@ -55,9 +55,9 @@ npm install --save-dev spec-fusion
 npx spec-fusion init
 ```
 
-The initializer installs the main guide and eight Codex stage skills into `.agents/skills/`, eight Gemini TOML commands under `.gemini/commands/spec-fusion/`, eight Claude Markdown commands under `.claude/commands/spec-fusion/`, and the main Claude guide under `.claude/skills/spec-fusion/` (linked to the shared guide when possible). It does not write to `~/.agents`, `~/.codex`, `~/.gemini`, or `~/.claude`.
+The initializer installs the main guide and eight Codex stage skills into `.agents/skills/`, eight Gemini TOML commands under `.gemini/commands/spec-fusion/`, eight Claude Markdown commands under `.claude/commands/spec-fusion/`, and the main Claude guide under `.claude/skills/spec-fusion/` (linked to the shared guide when possible). By default, it also installs Matt Pocock's skills (`mattpocock/skills`) and initializes OpenSpec (`@fission-ai/openspec`) for the selected agents. It does not write to `~/.agents`, `~/.codex`, `~/.gemini`, or `~/.claude` on behalf of Spec Fusion.
 
-To choose a subset of agents, run `npx spec-fusion init --agent codex`, `--agent gemini`, or `--agent claude`; repeat `--agent` as needed. Add `--copy` to avoid symlinks. Existing skill files and directories are skipped, not overwritten.
+To choose a subset of agents, run `npx spec-fusion init --agent codex`, `--agent gemini`, or `--agent claude`; repeat `--agent` as needed. Add `--copy` to avoid symlinks, or `--skip-deps` to install Spec Fusion only without running the Matt Pocock or OpenSpec installers. Existing skill files and directories are skipped, not overwritten.
 
 Before npm publication, build/test the package locally:
 
