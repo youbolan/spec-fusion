@@ -1,32 +1,69 @@
 # Spec Fusion
 
-**Matt Pocock + OpenSpec**, with eight human-controlled stages and a review checkpoint after each. This repository is a publish-ready template for installing Spec Fusion as an npm CLI, a Codex plugin marketplace, a Claude Code plugin, or a project-local skill for Codex, Gemini CLI, and Claude Code.
+**Matt Pocock + OpenSpec**, with eight human-controlled stages and a review checkpoint after each. Install Spec Fusion as a project-local npm CLI (recommended), via `npx skills add`, or as a Codex / Claude Code plugin.
 
-Spec Fusion **does not bundle** Matt Pocock's skills or OpenSpec. Install them separately. It does not automatically execute any development phase.
+Spec Fusion does not automatically execute any development phase.
 
-## Quick start — install with npx from GitHub (no npm publication needed)
+## Quick start — install with npm (recommended, project-local)
 
-**Recommended for GitHub distribution.** Requires Node.js **22.20+**, an accessible GitHub repository containing this publisher project, and no npm account. Run from the **target code project's root**, not the Spec Fusion source repository:
+Run inside your target project's root directory:
+
+```sh
+cd /path/to/your/repository
+npm init -y                           # skip if package.json already exists
+npm install --save-dev spec-fusion@latest
+npx spec-fusion init
+```
+
+By default, `npx spec-fusion init` installs everything project-locally for **Codex**, **Gemini CLI**, and **Claude Code**:
+- **Spec Fusion**: main guide and eight Codex stage skills in `.agents/skills/`, eight Gemini TOML commands in `.gemini/commands/spec-fusion/`, eight Claude Markdown commands in `.claude/commands/spec-fusion/`, and the main Claude guide in `.claude/skills/spec-fusion/` (symlinked to `.agents/skills/spec-fusion/` when possible).
+- **Matt Pocock's skills**: installs `mattpocock/skills` (`--skill '*'`) for the selected agents.
+- **OpenSpec**: initializes `openspec/` and OpenSpec skills (`@fission-ai/openspec` v2.0.0+) for the selected agents.
+
+> **OpenSpec workflows note:** OpenSpec installs its default `core` workflow set unless you have enabled additional workflows globally. To enable `new`, `ff`, `continue`, and `update` alongside `apply`, `verify`, and `archive`, run:
+> ```sh
+> openspec config profile   # select all or enable New/Continue/Update/Fast-forward
+> openspec update
+> ```
+
+### Installer options
+- **Select specific agents**: `npx spec-fusion init --agent codex`, `--agent gemini`, or `--agent claude` (repeat `--agent` as needed).
+- **Avoid symlinks**: add `--copy`.
+- **Skip Matt Pocock & OpenSpec**: add `--skip-deps` to install only Spec Fusion's skills and commands.
+- Existing files and directories are skipped, not overwritten.
+
+To test from a local checkout before publishing:
+
+```sh
+npm test
+npm pack
+npm install --save-dev /absolute/path/to/spec-fusion-0.3.1.tgz
+npx spec-fusion init
+```
+
+## Alternative — install skills only with `npx skills add`
+
+Requires Node.js **22.20+**. Run from the **target code project's root**:
 
 ```sh
 cd /path/to/your/code-project
 
-# Install the main workflow guide and all eight independently invoked stage skills
-npx skills add YOUR_GITHUB_OWNER/spec-fusion --skill '*' \
+# Install the main workflow guide and all eight stage skills
+npx skills add youbolan/spec-fusion --skill '*' \
   -a codex -a gemini-cli -a claude-code
 
 # Confirm skills were installed in this project
 npx skills list
 ```
 
-Replace `YOUR_GITHUB_OWNER` with the actual GitHub username or organization. The repository must first be uploaded to GitHub; these commands are examples, not a live published address. **No `-g` flag:** installation stays project-local. To install *only* the main workflow guide instead of all nine skills:
+To install *only* the main workflow guide instead of all nine skills:
 
 ```sh
-npx skills add YOUR_GITHUB_OWNER/spec-fusion --skill spec-fusion \
+npx skills add youbolan/spec-fusion --skill spec-fusion \
   -a codex -a gemini-cli -a claude-code
 ```
 
-To test locally **before pushing to GitHub**, run the same installer against an extracted checkout:
+To test from a local checkout:
 
 ```sh
 cd /path/to/your/code-project
@@ -34,63 +71,25 @@ npx skills add /absolute/path/to/spec-fusion-publisher --skill '*' \
   -a codex -a gemini-cli -a claude-code
 ```
 
-`npx skills add` installs SKILL.md directories, including Codex's `$spec-fusion-1-interview-and-clarify` stage skill. **It does not automatically install the custom Claude Code and Gemini CLI slash-command adapters** (`/spec-fusion:1-interview-and-clarify`, etc.). For those exact namespaced slash commands without publishing npm, first clone or extract the publisher repository, then initialize the *target* project:
-
-```sh
-node /absolute/path/to/spec-fusion-publisher/bin/spec-fusion.mjs init \
-  --project /absolute/path/to/your/code-project
-```
-
-The initializer also installs the main/stage skills and does not overwrite an existing skill by default. When an installation already exists, review the skipped files before updating. The `npx skills` route and the initializer are **alternative installation routes**; don't run both unless you specifically need the custom slash-command adapters.
-
-**Prerequisites:** Neither install route installs Matt Pocock's skills or the OpenSpec CLI. Install those independently. See [the skill installation guide](skills/spec-fusion/references/INSTALL.md).
-
-## Install using npm (project-local)
-
-These commands work **after a maintainer publishes the npm package** and confirms that the `spec-fusion` package name is available:
-
-```sh
-cd /path/to/your/repository
-npm install --save-dev spec-fusion
-npx spec-fusion init
-```
-
-The initializer installs the main guide and eight Codex stage skills into `.agents/skills/`, eight Gemini TOML commands under `.gemini/commands/spec-fusion/`, eight Claude Markdown commands under `.claude/commands/spec-fusion/`, and the main Claude guide under `.claude/skills/spec-fusion/` (linked to the shared guide when possible). By default, it also installs Matt Pocock's skills (`mattpocock/skills`) and initializes OpenSpec (`@fission-ai/openspec`) for the selected agents. It does not write to `~/.agents`, `~/.codex`, `~/.gemini`, or `~/.claude` on behalf of Spec Fusion.
-
-To choose a subset of agents, run `npx spec-fusion init --agent codex`, `--agent gemini`, or `--agent claude`; repeat `--agent` as needed. Add `--copy` to avoid symlinks, or `--skip-deps` to install Spec Fusion only without running the Matt Pocock or OpenSpec installers. Existing skill files and directories are skipped, not overwritten.
-
-Before npm publication, build/test the package locally:
-
-```sh
-npm test
-npm pack
-npm install --save-dev /absolute/path/to/spec-fusion-0.2.0.tgz
-npx spec-fusion init
-```
+**Limitations of `npx skills add`:** It installs `SKILL.md` directories only—it does **not** install the custom Claude/Gemini slash-command adapters (`/spec-fusion:1-interview-and-clarify`, etc.), Matt Pocock's skills, or OpenSpec. Use `npx spec-fusion init` (or `node /path/to/spec-fusion-publisher/bin/spec-fusion.mjs init --project /path/to/your/code-project`) if you want the full setup. See [the skill installation guide](skills/spec-fusion/references/INSTALL.md).
 
 ## Install from the Codex plugin marketplace
 
-After pushing **this repository**, with `.agents/plugins/marketplace.json`, to GitHub:
-
 ```sh
-codex plugin marketplace add YOUR_GITHUB_OWNER/spec-fusion
+codex plugin marketplace add youbolan/spec-fusion
 codex plugin add spec-fusion@spec-fusion
 ```
-
-Replace `YOUR_GITHUB_OWNER` with your real GitHub username or organization, and confirm the repository name matches. Adding the marketplace and installing the plugin are separate steps. These commands are **not active yet** until the repository is published.
 
 The Codex plugin manager installs plugins as managed components, which is different from copying a skill into a project. If a physical project-local skill is needed, use npm `init` above. For project-scoped plugin enablement, see the project `.codex/config.toml` documentation.
 
 ## Claude Code plugin option
 
-After pushing the same repository, Claude Code can use the compatibility marketplace:
-
 ```text
-/plugin marketplace add YOUR_GITHUB_OWNER/spec-fusion
+/plugin marketplace add youbolan/spec-fusion
 /plugin install spec-fusion@spec-fusion
 ```
 
-Alternatively, use npm `init`, which installs `.claude/skills/spec-fusion/` in your repository. The npm approach also serves Gemini CLI.
+Alternatively, use `npx spec-fusion init`, which installs `.claude/skills/spec-fusion/` in your repository and also serves Codex and Gemini CLI.
 
 ## Stage-specific commands — manual, one at a time
 
@@ -107,9 +106,9 @@ The project-local `npx spec-fusion init` installer now installs **eight independ
 | 7 | `/spec-fusion:7-verify` | `$spec-fusion-7-verify` |
 | 8 | `/spec-fusion:8-archive` | `$spec-fusion-8-archive` |
 
-Run one command, review the output, then choose the next command manually. The wrapper routes to the matching installed Matt Pocock or OpenSpec workflow where the agent permits it. Commands are not literal shell aliases and cannot bypass upstream user-invocation restrictions. The installer does not download the upstream dependencies automatically.
+Run one command, review the output, then choose the next command manually. The wrapper routes to the matching installed Matt Pocock or OpenSpec workflow where the agent permits it. Commands are not literal shell aliases and cannot bypass upstream user-invocation restrictions.
 
-**Project-local installation**: `.agents/skills/` (Codex stages and main guide), `.claude/commands/spec-fusion/` (Claude namespace), `.gemini/commands/spec-fusion/` (Gemini namespace), plus Claude main guide under `.claude/skills/spec-fusion/`. **Claude plugin** installation exposes the eight slash commands under the `spec-fusion` plugin namespace, and the Codex plugin exposes the eight stage skills. `npx skills add` installs SKILL.md directories but does **not** install Gemini TOML or Claude custom command adapters; use `npx spec-fusion init` after publishing the npm installer or install the adapters manually from this repository.
+**Project-local installation**: `.agents/skills/` (Codex stages and main guide), `.claude/commands/spec-fusion/` (Claude namespace), `.gemini/commands/spec-fusion/` (Gemini namespace), plus Claude main guide under `.claude/skills/spec-fusion/`. **Claude plugin** installation exposes the eight slash commands under the `spec-fusion` plugin namespace, and the Codex plugin exposes the eight stage skills. `npx skills add` installs SKILL.md directories only; use `npx spec-fusion init` to also install the Gemini TOML / Claude custom command adapters, Matt Pocock's skills, and OpenSpec.
 
 ## Manual development sequence
 
@@ -144,7 +143,7 @@ RELEASE.md                       Publishing checklist
 
 ## Publishing
 
-See [RELEASE.md](RELEASE.md). Ownership of the GitHub repository and npm namespace is required. This ZIP is **not** already published to GitHub or npm, and the package name's availability has not been confirmed.
+See [RELEASE.md](RELEASE.md) for maintainer release steps.
 
 ## Upstream projects
 

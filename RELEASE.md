@@ -1,26 +1,74 @@
-# Release instructions — Spec Fusion v0.2.0
+# Release instructions — Spec Fusion
 
-This release adds eight manually invocable stage commands to Codex, Gemini CLI and Claude Code. Follow the remaining release instructions, then run `npm test` and `npm pack --dry-run` before publishing. Do not claim the plugin or npm package is already published.
+This guide covers testing, publishing `spec-fusion` to npm, and pushing updates to [youbolan/spec-fusion](https://github.com/youbolan/spec-fusion).
 
-## Release and publishing checklist
+## 1. Pre-release checks
 
-This distribution is prepared locally, **not published**. Do not claim the example install commands are live until completed.
+From `/Users/bolanyou/Projects/spec-fusion-publisher`:
 
-## Before publishing
+```sh
+npm test
+npm pack --dry-run
+```
 
-1. Choose the GitHub owner (`YOUR_GITHUB_OWNER`) and create a repository named `spec-fusion` under it. If naming differs, update install commands in README and skill references.
-2. Check whether the npm package name `spec-fusion` is available (`npm view spec-fusion`). If unavailable, change `package.json.name` to a scope you control, e.g. `@YOUR_NPM_SCOPE/spec-fusion`, and update npm commands in README and skill references.
-3. Decide a license and publisher metadata. MIT is supplied as a proposed license; modify before publishing if needed.
-4. Ensure Matt Pocock and OpenSpec commands remain current. The package only references upstream projects; it does not vendor their code.
-5. Run `npm test`, `npm pack --dry-run`, and optional `claude plugin validate . --strict` if Claude is installed; use Codex plugin commands to test from a local checkout if available.
-6. Push the source repository. Keep `.agents/plugins/marketplace.json` and plugin manifests in Git (hidden directories matter).
-7. Test marketplace installation: `codex plugin marketplace add YOUR_GITHUB_OWNER/spec-fusion`; then `codex plugin add spec-fusion@spec-fusion`.
-8. Publish npm only after checking package name and login: `npm login`, `npm publish --access public` (requires account permissions).
-9. Test `npm install --save-dev spec-fusion` and `npx spec-fusion init` in a separate project, and verify Codex, Gemini CLI, and Claude Code discovery.
+Confirm all tests pass and `npm pack --dry-run` includes the expected files (`bin/`, `skills/`, `commands/`, `adapters/`, plugin manifests, `README.md`, `LICENSE`).
 
-## What this project does NOT do
+## 2. Bump the version
 
-- It does not publish to GitHub or npm, create credentials, or register a public directory listing.
-- It does not install or repackage Matt Pocock's skills or OpenSpec.
-- Installing the npm package does not mutate the project outside `node_modules` until the user runs `npx spec-fusion init`.
-- It does not automate the eight individual development stages.
+Update `"version"` in `package.json` (or use `npm version`):
+
+```sh
+npm version patch   # or minor / major
+```
+
+## 3. Log in and publish to npm
+
+```sh
+npm login
+npm whoami
+npm publish --dry-run
+npm publish --access public
+```
+
+If an exact version number was previously used on npm, bump the version (`npm version patch`) and re-run `npm publish --access public`.
+
+## 4. Verify the published npm package
+
+Confirm the new version is live on the registry:
+
+```sh
+npm view spec-fusion versions --json
+```
+
+Test installing in a fresh temporary folder (using `--prefer-online` to bypass local cache right after publishing):
+
+```sh
+mkdir -p /tmp/spec-fusion-verify && cd /tmp/spec-fusion-verify
+npm init -y
+npm cache clean --force
+npm install --save-dev spec-fusion@latest --prefer-online
+npx spec-fusion init
+```
+
+Verify that `.agents/skills/`, `.claude/`, `.gemini/`, and `openspec/` are created, then clean up:
+
+```sh
+rm -rf /tmp/spec-fusion-verify
+```
+
+## 5. Push to GitHub
+
+Keep `.agents/`, `.claude-plugin/`, and `.codex-plugin/` tracked in Git:
+
+```sh
+cd /Users/bolanyou/Projects/spec-fusion-publisher
+git add -A
+git commit -m "chore: release v$(node -p 'require("./package.json").version')"
+git push origin master --tags
+```
+
+## Notes
+
+- Installing the npm package only writes to `node_modules/` until the user runs `npx spec-fusion init`.
+- `npx spec-fusion init` installs Spec Fusion, Matt Pocock's skills (`mattpocock/skills`), and OpenSpec (`@fission-ai/openspec` v2.0.0+) unless `--skip-deps` is passed.
+- Spec Fusion does not automate the eight individual development stages.
