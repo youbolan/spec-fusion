@@ -29,20 +29,20 @@ To run **one step and stop**, use `/spec-fusion:1-interview-and-clarify` through
 |---|---|---|---|---|
 | 1 | Matt Pocock | `/grill-with-docs` | Invoke `grill-with-docs` skill | Interview results, `GLOSSARY.md`, ADRs reviewed |
 | 2 | Matt Pocock | `/to-spec` | Invoke `to-spec` skill | Draft specification approved and its path recorded |
-| 3 | OpenSpec (expanded) | `/opsx:new <change>` | `$openspec-new-change` | Change scaffold confirmed |
-| 4 | OpenSpec (expanded) | `/opsx:ff <change>` | `$openspec-ff-change` | Proposal, spec deltas, design, and tasks approved |
-| 5 | OpenSpec | `/opsx:apply <change>` | `$openspec-apply-change` | Code, tests, and task checkboxes reviewed |
+| 3 | OpenSpec (expanded) | `/openspec-new-change <change>` | `$openspec-new-change` | Change scaffold confirmed |
+| 4 | OpenSpec (expanded) | `/openspec-ff-change <change>` | `$openspec-ff-change` | Proposal, spec deltas, design, and tasks approved |
+| 5 | OpenSpec | `/openspec-apply-change <change>` | `$openspec-apply-change` | Code, tests, and task checkboxes reviewed |
 | 6 | Matt Pocock | `/code-review` | Invoke `code-review` skill | Review findings triaged; return to step 5 for fixes |
-| 7 | OpenSpec (expanded) | `/opsx:verify <change>` | `$openspec-verify-change` | Requirement, scenario, design, task acceptance reviewed |
-| 8 | OpenSpec | `/opsx:archive <change>` | `$openspec-archive-change` | Approved deltas synced into canonical specs; change archived |
+| 7 | OpenSpec (expanded) | `/openspec-verify-change <change>` | `$openspec-verify-change` | Requirement, scenario, design, task acceptance reviewed |
+| 8 | OpenSpec | `/openspec-archive-change <change>` | `$openspec-archive-change` | Approved deltas synced into canonical specs; change archived |
 
-OpenSpec's names in the middle column are **command** names; Codex's are **generated skill** names and are not a one-to-one string substitution. Matt skill invocation syntax can vary by client; if direct slash invocation is unavailable, ask the agent to use the installed skill by its exact name.
+OpenSpec's names in the middle column are **skill** identifiers (OpenSpec v2.0.0+); Codex uses `$openspec-*`. Matt skill invocation syntax can vary by client; if direct slash invocation is unavailable, ask the agent to use the installed skill by its exact name.
 
 ### Workflow variants (never switch silently)
 
-- **Prefer one artifact at a time?** Use OpenSpec `/opsx:continue` (Codex `$openspec-continue-change`) repeatedly in step 4 instead of `/opsx:ff`; inspect each artifact before requesting the next. This preserves finer manual control.
-- **Planning artifacts need revisions?** Use `/opsx:update` (Codex `$openspec-update-change`) or manually edit the Markdown, then re-check coherence before Apply.
-- **OpenSpec core profile only?** Use `/opsx:propose <change>` (Codex `$openspec-propose`) for stages 3-4 combined, if the user chooses this variation. For a separate Verify stage, enable the expanded profile (`openspec config profile` then `openspec update`).
+- **Prefer one artifact at a time?** Use OpenSpec `/openspec-continue-change` (Codex `$openspec-continue-change`) repeatedly in step 4 instead of `/openspec-ff-change`; inspect each artifact before requesting the next. This preserves finer manual control.
+- **Planning artifacts need revisions?** Use `/openspec-update-change` (Codex `$openspec-update-change`) or manually edit the Markdown, then re-check coherence before Apply.
+- **OpenSpec core profile only?** Use `/openspec-propose <change>` (Codex `$openspec-propose`) for stages 3-4 combined, if the user chooses this variation. For a separate Verify stage, enable the expanded profile (`openspec config profile` then `openspec update`).
 - **No separate Matt tickets or implementation pass.** OpenSpec owns `tasks.md` and Apply; avoid duplicate Matt `to-tickets` / `implement-spec` workflows.
 
 ## Handoff requirements

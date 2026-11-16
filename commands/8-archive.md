@@ -6,7 +6,7 @@ argument-hint: [feature or change identifier]
 # Spec Fusion: 8-archive
 
 Stage: **Archive an approved, verified OpenSpec change.**
-Owner: **OpenSpec**. Upstream skill/command: **archive** (Claude/Gemini identifier: `/opsx:archive`; Codex equivalent: `$openspec-archive-change`).
+Owner: **OpenSpec**. Upstream skill/command: **archive** (Claude/Gemini identifier: `/openspec-archive-change`; Codex equivalent: `$openspec-archive-change`).
 
 Confirm the user explicitly requested archival, that verification is satisfactory and any review blockers are resolved. Use the installed OpenSpec archive workflow and confirm the in-flight spec deltas are synchronized into canonical openspec/specs/ by the tool's documented behavior. Do not archive on missing verification or unresolved critical issues without explaining and obtaining explicit override approval.
 

@@ -6,7 +6,7 @@ argument-hint: [feature or change identifier]
 # Spec Fusion: 7-verify
 
 Stage: **Verify requirements, design and task acceptance before archiving.**
-Owner: **OpenSpec**. Upstream skill/command: **verify** (Claude/Gemini identifier: `/opsx:verify`; Codex equivalent: `$openspec-verify-change`).
+Owner: **OpenSpec**. Upstream skill/command: **verify** (Claude/Gemini identifier: `/openspec-verify-change`; Codex equivalent: `$openspec-verify-change`).
 
 Read the relevant OpenSpec change, code and test evidence, and earlier code-review results where provided. Use installed OpenSpec verify workflow as a final focused acceptance gate. Check required scenarios, deltas, design and tasks; avoid pointless repetition of documented completed checks but independently evaluate any gaps. Do not archive or automatically implement fixes.
 

@@ -115,11 +115,11 @@ Matt Pocock (`mattpocock/skills`):
 - `code-review`
 - `setup-matt-pocock-skills` (project setup where required)
 
-OpenSpec (`Fission-AI/OpenSpec`):
+OpenSpec (`Fission-AI/OpenSpec` v2.0.0+):
 
-- Expanded workflow commands: `/opsx:new`, `/opsx:ff`, `/opsx:apply`, `/opsx:verify`, `/opsx:archive`.
-- Optional planning review: `/opsx:continue`, `/opsx:update`.
-- Core-profile alternative: `/opsx:propose`.
+- Expanded workflow skills: `/openspec-new-change`, `/openspec-ff-change`, `/openspec-apply-change`, `/openspec-verify-change`, `/openspec-archive-change`.
+- Optional planning review: `/openspec-continue-change`, `/openspec-update-change`.
+- Core-profile alternative: `/openspec-propose`.
 
 Set up OpenSpec in each project where you want to maintain canonical specs:
 
@@ -135,20 +135,20 @@ Choose the **expanded** profile for independent `new`, `ff`, and `verify` steps.
 
 Install Matt Pocock's official skills following the README for each selected agent, then run `setup-matt-pocock-skills` in that repository if needed. Note: `/to-spec` may publish to the configured issue tracker; select a local-file workflow or confirm before publishing.
 
-### OpenSpec command mappings in Codex
+### OpenSpec skill mappings (v2.0.0+)
 
-OpenSpec's slash commands are not how Codex calls its generated OpenSpec skills:
+OpenSpec v2.0.0 replaced `/opsx:*` slash commands with unified skills (`openspec-*`):
 
 | Manual stage | Claude Code / Gemini CLI | Codex |
 |---|---|---|
-| Create change | `/opsx:new` | `$openspec-new-change` |
-| Generate plan | `/opsx:ff` | `$openspec-ff-change` |
-| Incremental plan | `/opsx:continue` | `$openspec-continue-change` |
-| Revise plan | `/opsx:update` | `$openspec-update-change` |
-| Implement | `/opsx:apply` | `$openspec-apply-change` |
-| Verify | `/opsx:verify` | `$openspec-verify-change` |
-| Archive | `/opsx:archive` | `$openspec-archive-change` |
-| Core profile alternative | `/opsx:propose` | `$openspec-propose` |
+| Create change | `/openspec-new-change` | `$openspec-new-change` |
+| Generate plan | `/openspec-ff-change` | `$openspec-ff-change` |
+| Incremental plan | `/openspec-continue-change` | `$openspec-continue-change` |
+| Revise plan | `/openspec-update-change` | `$openspec-update-change` |
+| Implement | `/openspec-apply-change` | `$openspec-apply-change` |
+| Verify | `/openspec-verify-change` | `$openspec-verify-change` |
+| Archive | `/openspec-archive-change` | `$openspec-archive-change` |
+| Core profile alternative | `/openspec-propose` | `$openspec-propose` |
 
 Matt Pocock's skill identifiers are `grill-with-docs`, `to-spec`, and `code-review`. Invocation syntax varies by agent; invoke by exact installed skill identifier rather than inventing a slash command.
 

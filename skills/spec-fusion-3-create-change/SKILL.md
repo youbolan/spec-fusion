@@ -6,7 +6,7 @@ description: "Manual Spec Fusion stage 3: Create a new OpenSpec change scaffold 
 # Spec Fusion: 3-create-change
 
 Stage: **Create a new OpenSpec change scaffold only.**
-Owner: **OpenSpec**. Upstream skill/command: **new** (Claude/Gemini identifier: `/opsx:new`; Codex equivalent: `$openspec-new-change`).
+Owner: **OpenSpec**. Upstream skill/command: **new** (Claude/Gemini identifier: `/openspec-new-change`; Codex equivalent: `$openspec-new-change`).
 
 Read the approved feature spec and relevant current OpenSpec capability specs. Obtain or derive a sensible change ID; invoke the installed OpenSpec new-change workflow for this ID, creating the scaffold only. Do not create all artifacts, apply code, or archive.
 

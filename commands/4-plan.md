@@ -6,7 +6,7 @@ argument-hint: [feature or change identifier]
 # Spec Fusion: 4-plan
 
 Stage: **Produce and approve OpenSpec proposal, design, deltas, and tasks.**
-Owner: **OpenSpec**. Upstream skill/command: **ff** (Claude/Gemini identifier: `/opsx:ff`; Codex equivalent: `$openspec-ff-change`).
+Owner: **OpenSpec**. Upstream skill/command: **ff** (Claude/Gemini identifier: `/openspec-ff-change`; Codex equivalent: `$openspec-ff-change`).
 
 Read the approved Matt Pocock draft spec, current canonical capability specs and the new change folder. Use the installed OpenSpec fast-forward planning workflow (or a user-selected continue variant) to generate proposal, design, requirement deltas, and tasks. Ensure deltas accurately preserve and modify canonical requirements, and avoid duplicating or contradicting existing specs. Do not modify application code.
 

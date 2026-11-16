@@ -3,7 +3,7 @@ prompt = '''
 # Spec Fusion: 5-implement
 
 Stage: **Implement approved OpenSpec tasks, then stop.**
-Owner: **OpenSpec**. Upstream skill/command: **apply** (Claude/Gemini identifier: `/opsx:apply`; Codex equivalent: `$openspec-apply-change`).
+Owner: **OpenSpec**. Upstream skill/command: **apply** (Claude/Gemini identifier: `/openspec-apply-change`; Codex equivalent: `$openspec-apply-change`).
 
 Check that the OpenSpec proposal, design, deltas, and tasks are approved. Use the installed OpenSpec apply workflow to implement the selected approved change tasks and run relevant tests. OpenSpec remains responsible for task tracking. Do not invoke Matt Pocock implement or implement-spec, and do not automatically run code review or verification.
 

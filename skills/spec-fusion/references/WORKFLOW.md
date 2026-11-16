@@ -9,18 +9,18 @@ flowchart TD
     B -->|Yes| C["2. Matt: /to-spec"]
     C --> D{"Draft spec approved?"}
     D -->|No| C
-    D -->|Yes| E["3. OpenSpec: /opsx:new"]
-    E --> F["4. OpenSpec: /opsx:ff (or /opsx:continue)"]
+    D -->|Yes| E["3. OpenSpec: /openspec-new-change"]
+    E --> F["4. OpenSpec: /openspec-ff-change (or /openspec-continue-change)"]
     F --> G{"Proposal, deltas, design, tasks approved?"}
-    G -->|No: /opsx:update| F
-    G -->|Yes| H["5. OpenSpec: /opsx:apply + tests"]
+    G -->|No: /openspec-update-change| F
+    G -->|Yes| H["5. OpenSpec: /openspec-apply-change + tests"]
     H --> I["6. Matt: /code-review"]
     I --> J{"Review findings?"}
     J -->|Fix via Apply| H
-    J -->|Clear| K["7. OpenSpec: /opsx:verify"]
+    J -->|Clear| K["7. OpenSpec: /openspec-verify-change"]
     K --> L{"Spec acceptance passed?"}
     L -->|No| H
-    L -->|Yes and user approves| M["8. OpenSpec: /opsx:archive"]
+    L -->|Yes and user approves| M["8. OpenSpec: /openspec-archive-change"]
     M --> N["Canonical capability specs synced"]
 ```
 
@@ -39,9 +39,9 @@ flowchart TD
 
 ### Variations
 
-- Use `/opsx:continue` instead of `/opsx:ff` if you want to review one planning artifact at a time.
-- Use `/opsx:update` to revise existing planning artifacts coherently.
-- If only the default OpenSpec profile is installed, `/opsx:propose` combines stages 3-4. Enable expanded for standalone `/opsx:verify`.
+- Use `/openspec-continue-change` instead of `/openspec-ff-change` if you want to review one planning artifact at a time.
+- Use `/openspec-update-change` to revise existing planning artifacts coherently.
+- If only the default OpenSpec profile is installed, `/openspec-propose` combines stages 3-4. Enable expanded for standalone `/openspec-verify-change`.
 - **Codex spells OpenSpec skills differently:** `$openspec-new-change`, `$openspec-ff-change`, `$openspec-apply-change`, `$openspec-verify-change`, `$openspec-archive-change`.
 - Matt Pocock's published interview name is **`grill-with-docs`** (with `docs`, plural).
 - Git commits at checkpoints make it easier to stop and switch between Codex, Gemini CLI, and Claude Code.
