@@ -24,7 +24,7 @@ npm version patch   # or minor / major
 ## 3. Log in and publish to npm
 
 ```sh
-npm login
+npm login --auth-type=web
 npm whoami
 npm publish --dry-run
 npm publish --access public
