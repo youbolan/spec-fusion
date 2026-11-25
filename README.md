@@ -15,21 +15,27 @@ npm install --save-dev spec-fusion@latest
 npx spec-fusion init
 ```
 
-By default, `npx spec-fusion init` installs everything project-locally for **Codex**, **Gemini CLI**, and **Claude Code**:
-- **Spec Fusion**: main guide and eight Codex stage skills in `.agents/skills/`, eight Gemini TOML commands in `.gemini/commands/spec-fusion/`, eight Claude Markdown commands in `.claude/commands/spec-fusion/`, and the main Claude guide in `.claude/skills/spec-fusion/` (symlinked to `.agents/skills/spec-fusion/` when possible).
-- **Matt Pocock's skills**: installs `mattpocock/skills` (`--skill '*'`) for the selected agents.
-- **OpenSpec**: initializes `openspec/` and OpenSpec skills (`@fission-ai/openspec` v2.0.0+) for the selected agents.
-
+If you didn't configure OpenSpec before, run the following once on your local machine, recommend to select all workflows.
 > **OpenSpec workflows note:** OpenSpec installs its default `core` workflow set unless you have enabled additional workflows globally. To enable `new`, `ff`, `continue`, and `update` alongside `apply`, `verify`, and `archive`, run:
 > ```sh
 > openspec config profile   # select all or enable New/Continue/Update/Fast-forward
 > openspec update
 > ```
 
+
+By default, `npx spec-fusion init` installs everything project-locally for **Codex**, **Gemini CLI**, and **Claude Code**:
+- **Spec Fusion**: main guide, eight stage skills, and `spec-fusion-investigate-bug` (plus `investigate-bug` alias) in `.agents/skills/`, Gemini TOML commands in `.gemini/commands/spec-fusion/`, Claude Markdown commands in `.claude/commands/spec-fusion/`, and Claude skills in `.claude/skills/`.
+- **Jira MCP server**: configures the official Atlassian Remote MCP server (`https://mcp.atlassian.com/v2/mcp`, OAuth 2.1 browser login) in `.mcp.json` (Claude Code), `.gemini/settings.json` (Gemini CLI), and `.codex/config.toml` (Codex).
+- **Matt Pocock's skills**: installs `mattpocock/skills` (`--skill '*'`) for the selected agents.
+- **OpenSpec**: initializes `openspec/` and OpenSpec skills (`@fission-ai/openspec` v2.0.0+) for the selected agents.
+
+
+
 ### Installer options
 - **Select specific agents**: `npx spec-fusion init --agent codex`, `--agent gemini`, or `--agent claude` (repeat `--agent` as needed).
+- **Skip Jira MCP server**: add `--skip-jira`.
 - **Avoid symlinks**: add `--copy`.
-- **Skip Matt Pocock & OpenSpec**: add `--skip-deps` to install only Spec Fusion's skills and commands.
+- **Skip external installers**: add `--skip-deps` to install only Spec Fusion's skills and commands (add `--with-jira` to still configure Jira MCP).
 - Existing files and directories are skipped, not overwritten.
 
 To test from a local checkout before publishing:
@@ -105,6 +111,14 @@ The project-local `npx spec-fusion init` installer now installs **eight independ
 | 6 | `/spec-fusion:6-code-review` | `$spec-fusion-6-code-review` |
 | 7 | `/spec-fusion:7-verify` | `$spec-fusion-7-verify` |
 | 8 | `/spec-fusion:8-archive` | `$spec-fusion-8-archive` |
+
+### Standalone utility skills
+
+| Skill | Claude Code / Gemini CLI | Codex | Purpose |
+|---|---|---|---|
+| Investigate Bug | `/spec-fusion:investigate-bug` | `$spec-fusion-investigate-bug` (or alias `$investigate-bug` if no conflict) | Read-only legacy bug investigation, root cause analysis, blast radius, smallest safe fix, and Jira-ready report. Prompts for a Jira ticket/link (if Jira MCP server installed), uploaded file(s), or chat description if none is provided. |
+| Add Bug Investigation deliverable to JIRA | `/spec-fusion:add-bug-deliverable-to-jira` | `$spec-fusion-add-bug-deliverable-to-jira` (or alias `$add-bug-deliverable-to-jira`) | Posts `BUG-ANALYSIS-AND-FIX-SUGGESTION.md` as a comment on an existing Jira ticket and attaches `HANDOFF.md` and `BUG-ANALYSIS-AND-FIX-SUGGESTION.md` after confirmation. |
+| Create New Jira Ticket | `/spec-fusion:create-new-jira-ticket` | `$spec-fusion-create-new-jira-ticket` (or alias `$create-new-jira-ticket`) | Creates a new Jira ticket with the bug description (from chat or uploaded file), posts `BUG-ANALYSIS-AND-FIX-SUGGESTION.md` as a comment, and attaches both reports after confirmation. |
 
 Run one command, review the output, then choose the next command manually. The wrapper routes to the matching installed Matt Pocock or OpenSpec workflow where the agent permits it. Commands are not literal shell aliases and cannot bypass upstream user-invocation restrictions.
 

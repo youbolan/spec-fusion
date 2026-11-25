@@ -42,6 +42,14 @@ test('default installs eight Codex skills and Claude/Gemini stage commands', () 
   assert.equal(r.status, 0, r.stderr);
   assert.ok(existsSync(path.join(p, '.agents/skills/spec-fusion/SKILL.md')));
   assert.ok(existsSync(path.join(p, '.claude/skills/spec-fusion/SKILL.md')));
+  for (const extra of ['investigate-bug', 'add-bug-deliverable-to-jira', 'create-new-jira-ticket']) {
+    assert.ok(existsSync(path.join(p, `.agents/skills/spec-fusion-${extra}/SKILL.md`)), extra);
+    assert.ok(existsSync(path.join(p, `.claude/skills/spec-fusion-${extra}/SKILL.md`)), extra);
+    assert.ok(existsSync(path.join(p, `.agents/skills/${extra}/SKILL.md`)), extra);
+    assert.ok(existsSync(path.join(p, `.claude/skills/${extra}/SKILL.md`)), extra);
+    assert.ok(existsSync(path.join(p, `.claude/commands/spec-fusion/${extra}.md`)), extra);
+    assert.ok(existsSync(path.join(p, `.gemini/commands/spec-fusion/${extra}.toml`)), extra);
+  }
   for (const slug of stages) {
     assert.ok(existsSync(path.join(p, `.agents/skills/spec-fusion-${slug}/SKILL.md`)), slug);
     assert.ok(existsSync(path.join(p, `.claude/commands/spec-fusion/${slug}.md`)), slug);
@@ -95,11 +103,25 @@ test('copy mode works without symlink', () => withProject(p => {
   assert.equal(r.status, 0, r.stderr);
   assert.ok(lstatSync(path.join(p, '.claude/skills/spec-fusion')).isDirectory());
 }));
-test('default init also installs Matt Pocock skills and initializes OpenSpec', () => withProject(p => {
+test('default init also installs Jira MCP, Matt Pocock skills, and OpenSpec', () => withProject(p => {
   const { res, calls } = runWithMockBin(p, true);
   assert.equal(res.status, 0, res.stderr);
   assert.ok(calls.includes('npx --yes skills@latest add mattpocock/skills --skill * -a codex -a gemini-cli -a claude-code -y'));
   assert.ok(calls.includes('openspec init --tools codex,gemini,claude --force --no-animation'));
+  const claudeMcp = JSON.parse(readFileSync(path.join(p, '.mcp.json'), 'utf8'));
+  assert.deepEqual(claudeMcp.mcpServers.atlassian, { type: 'http', url: 'https://mcp.atlassian.com/v2/mcp' });
+  const geminiSettings = JSON.parse(readFileSync(path.join(p, '.gemini/settings.json'), 'utf8'));
+  assert.deepEqual(geminiSettings.mcpServers.atlassian, { httpUrl: 'https://mcp.atlassian.com/v2/mcp' });
+  const codexToml = readFileSync(path.join(p, '.codex/config.toml'), 'utf8');
+  assert.match(codexToml, /\[mcp_servers\.atlassian\]/);
+}));
+test('--skip-jira skips Jira MCP while still installing Matt Pocock skills and OpenSpec', () => withProject(p => {
+  const { res, calls } = runWithMockBin(p, true, '--skip-jira');
+  assert.equal(res.status, 0, res.stderr);
+  assert.ok(calls.length > 0);
+  assert.ok(!existsSync(path.join(p, '.mcp.json')));
+  assert.ok(!existsSync(path.join(p, '.gemini/settings.json')));
+  assert.ok(!existsSync(path.join(p, '.codex/config.toml')));
 }));
 test('agent filter scopes Matt Pocock skills and OpenSpec tools', () => withProject(p => {
   const { res, calls } = runWithMockBin(p, true, '--agent', 'claude');
@@ -111,4 +133,27 @@ test('--skip-deps skips Matt Pocock skills and OpenSpec', () => withProject(p =>
   const { res, calls } = runWithMockBin(p, true, '--skip-deps');
   assert.equal(res.status, 0, res.stderr);
   assert.equal(calls.length, 0);
+}));
+test('--with-jira configures official Atlassian Remote MCP for selected agents without overwriting existing entries', () => withProject(p => {
+  writeFileSync(path.join(p, '.mcp.json'), JSON.stringify({ mcpServers: { existing: { url: 'https://example.com' } } }, null, 2));
+  const r = run(p, '--with-jira');
+  assert.equal(r.status, 0, r.stderr);
+  const claudeMcp = JSON.parse(readFileSync(path.join(p, '.mcp.json'), 'utf8'));
+  assert.equal(claudeMcp.mcpServers.existing.url, 'https://example.com');
+  assert.deepEqual(claudeMcp.mcpServers.atlassian, { type: 'http', url: 'https://mcp.atlassian.com/v2/mcp' });
+  const geminiSettings = JSON.parse(readFileSync(path.join(p, '.gemini/settings.json'), 'utf8'));
+  assert.deepEqual(geminiSettings.mcpServers.atlassian, { httpUrl: 'https://mcp.atlassian.com/v2/mcp' });
+  const codexToml = readFileSync(path.join(p, '.codex/config.toml'), 'utf8');
+  assert.match(codexToml, /\[mcp_servers\.atlassian\]/);
+  assert.match(codexToml, /url = "https:\/\/mcp\.atlassian\.com\/v2\/mcp"/);
+  const r2 = run(p, '--with-jira');
+  assert.equal(r2.status, 0, r2.stderr);
+  assert.match(r2.stdout, /Already configured, skipped/);
+}));
+test('Jira MCP is not configured unless --with-jira is passed', () => withProject(p => {
+  const r = run(p);
+  assert.equal(r.status, 0, r.stderr);
+  assert.ok(!existsSync(path.join(p, '.mcp.json')));
+  assert.ok(!existsSync(path.join(p, '.gemini/settings.json')));
+  assert.ok(!existsSync(path.join(p, '.codex/config.toml')));
 }));
